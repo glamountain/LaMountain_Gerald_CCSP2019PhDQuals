@@ -1,0 +1,620 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University Assignment Title Page 
+% LaTeX Template
+% Version 1.0 (27/12/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (http://en.wikibooks.org/wiki/LaTeX/Title_Creation)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+% Instructions for using this template:
+% This title page is capable of being compiled as is. This is not useful for 
+% including it in another document. To do this, you have two options: 
+%
+% 1) Copy/paste everything between \begin{document} and \end{document} 
+% starting at \begin{titlepage} and paste this into another LaTeX file where you 
+% want your title page.
+% OR
+% 2) Remove everything outside the \begin{titlepage} and \end{titlepage} and 
+% move this file to the same directory as the LaTeX file you wish to add it to. 
+% Then add \input{./title_page_1.tex} to your LaTeX file where you want your
+% title page.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\title{Title page with logo}
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{glossaries}
+\usepackage[nolist,nohyperlinks]{acronym}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{algorithm,algorithmic}
+\usepackage{graphicx}
+\usepackage{xspace}
+\usepackage[caption=false]{subfig}
+\usepackage[justification=centering]{caption}
+\usepackage[numbers,square, comma, sort&compress]{natbib}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[margin=2cm]{geometry}
+\usepackage{setspace}
+\usepackage[splitrule]{footmisc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,calc}
+
+\renewcommand\thesection{\Alph{section}}
+\renewcommand\thesubsection{\thesection.\arabic{subsection}}
+
+\let\Algorithm\algorithm
+\renewcommand\algorithm[1][]{\Algorithm[#1]\setstretch{1.4}}
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+ 
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textbf{\LARGE NORTHEASTERN UNIVERSITY }\\[0.3cm] % Name of your university/college
+\textbf{\Large Department of Electrical and Computer Engineering}\\[0.5cm]
+ % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\vspace{0.4cm}
+\textsc{ \huge 2019 PhD Qualifying Examination }\\[0.03cm] % Title of your document
+\textit{ \large in }\\[0.03cm]
+\textsc{ \large Communications, Control and Signal Processing }\\[0.03cm]
+\vspace{1.5cm}
+
+\vspace{2cm}
+ 
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Submitted By:}\\[0.5cm]
+Gerald LaMountain \\ NUID: 001168808 \\ \textit{gerald@ece.neu.edu} % your name
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Under the Advisement Of:}\\[0.5cm]
+Dr. Pau Closas \\ Asst. Professor \\ \textit{pau.closas@northeastern.edu} % Supervisor's Name
+\end{flushright}
+\end{minipage}\\[1cm]
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\\
+%John \textsc{Smith}\\[3cm] % Your name
+
+\vspace{3cm}
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM SELECTION SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \emph{Selected Problem:} Problem 4 - Nonlinear Dynamic State Estimation}\\[2cm] % Date, change the \today to a set date if you want to be precise
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \emph{Submission Date:} \today }\\[2cm] % Date, change the \today to a set date if you want to be precise
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics{neuS_bB.png}\\[1cm] % Include a department/university logo - this will require the graphicx package
+ 
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{titlepage}
+
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT BODY
+%----------------------------------------------------------------------------------------
+
+\section{Discussion of the Extended Kalman Filter (EKF)}
+\label{sec:ekf}
+
+\subsection{}
+\setcounter{enumi}{3}
+
+We consider the nonlinear state space model described in (\ref{eq:ss_nonlin}) of the problem description
+
+\begin{align}
+    \begin{split}
+        x_{k+1} &= f(x_{k}) + \omega_{k} \\
+        y_{k}   &= h(x_{k}) + \nu_{k}
+    \end{split} & k &\geq 0 \nonumber \tag{3} \label{eq:ss_nonlin}
+\end{align}
+The linearization of this state space at time $k$ is computed by evaluating the Jacobians of the state transition and measurement equations $f(\cdot)$ and $h(\cdot)$ at state $x_{k}$. These are given by
+
+\begin{align}
+    \mathbf{F}_{k} &= F(\hat{x}_{k|k}) \triangleq \frac{\partial f(x)}{\partial x} \Bigr\rvert_{x = \hat{x}_{k|k}} & &, & \mathbf{H}_{k} &=  H(\hat{x}_{k|k}) \triangleq \frac{\partial h(x)}{\partial x} \Bigr\rvert_{x = \hat{x}_{k|k-1}} \label{eq:jacobian}
+\end{align}
+respectively. Note that in this formulation, the states at which the linearization is computed are given by the \emph{a posteriori} and \emph{a priori} state estimates respectively computed within the Kalman filter procedure. As such this definition is particular to the formulation of the extended Kalman filter rather than being a general definition of the linearization of a nonlinear state space model. The linearized state space model at each update is then given by
+
+\begin{align}
+    \begin{split}
+        x_{k+1} &= \mathbf{F}_{k}x_{k} + \omega_{k} \\
+        y_{k}   &= \mathbf{H}_{k}x_{k} + \nu_{k}
+    \end{split} & k &\geq 0 \label{eq:ss_lin}
+\end{align}
+
+The matrices $\mathbf{F}_{k}$ and $\mathbf{H}_{k}$ which arise from this linearization are generally time-invariant, as they are functions only of the state estimate $\hat{x}_{k}$ without explicit dependence on time. $\hat{x}_{k}$ is an estimate of the mean of the a posteriori distribution $p(x_{k}|y_{1:k})$ from a finite sequence of random measurements $y_{0} \hdots y_{k}$ and is, in turn, a random variable. As such, the matrices $\mathbf{F}_{k}$ and $\mathbf{H}_{k}$ can not be said to be deterministic, although they are the result of a deterministic function.
+
+% \newpage
+
+\subsection{}
+
+Algorithm \ref{alg:ekf} describes the steps requied to perform a single recursion of the extended Kalman filter. The extended Kalman filter procedure is nearly identical to the standard linear Kalman filter described in Algorithm \ref{alg:lkf}, with two important exceptions
+
+\begin{itemize}
+
+    \item Steps \ref{alg:ekf_pred} and \ref{alg:ekf_meas} of Algorithm \ref{alg:ekf} are computed using the nonlinear state transition and measurement equations while the corresponding Steps \ref{alg:kf_pred} and \ref{alg:kf_meas} of the linear filter are computed using linear matrix products.
+    
+    \item Steps \ref{alg:ekf_linf} and \ref{alg:ekf_linh} are added to Algorithm \ref{alg:ekf} which do not appear in Algorithm \ref{alg:lkf}. These steps compute the linearization matrices required for approximating the propagation of the the error covariance through the nonlinearity, allowing us to compute the approximate (suboptimal) Kalman gain and update the predicted state.
+    
+\end{itemize}
+
+\begin{algorithm}[!htb]
+\caption{Extended Kalman Filter}\label{alg:ekf}
+\begin{algorithmic}[1]
+\footnotesize \REQUIRE $\mathbf{y}_{k}$, $\hat{\mathbf{x}}_0$, $\mathbf{P}_{x,0|0}$, $\mathbf{R}_{k}$, and $\mathbf{Q}_{k}$ $\forall$ $k \geq 0$
+\medskip
+\STATE Set ${k} \Leftarrow 1$
+\begin{center}
+%\medskip %\normalsize
+\textbf{Time Update (Prediction)}
+\end{center}
+\STATE \label{alg:ekf_pred} Compute the predicted state by propagating the mean through the nonlinearity: $\hat{\mathbf{x}}_{k|k-1} = f(\hat{\mathbf{x}}_{k-1|k-1})$.
+\STATE \label{alg:ekf_linf} Compute the linearization of $f(\cdot)$ around the mean: $ \mathbf{F}_{k-1} = F(\hat{x}_{k-1|k-1}) \triangleq \frac{\partial f(x)}{\partial x} \Bigr\rvert_{x = \hat{x}_{k-1|k-1}}$.
+\STATE Compute the predicted error covariance:
+%\begin{center}
+$\mathbf{P}_{x,k|k-1} = \mathbf{F}_{k-1} \mathbf{P}_{x,k-1|k-1}
+\mathbf{F}_{k-1}^\top + \mathbf{Q}_k$. \label{alg:ekf_P_pred}
+%\end{center}
+\medskip
+\STATE \label{alg:ekf_meas} Compute the predicted measurement: $\hat{\mathbf{y}}_{k|k-1} = h(\hat{\mathbf{x}}_{k|k-1})$.
+%\end{center}
+\STATE \label{alg:ekf_linh} Compute the linearization of $h(\cdot)$ around the mean: $ \mathbf{H}_{k} = H(\hat{x}_{k|k-1}) \triangleq \frac{\partial h(x)}{\partial x} \Bigr\rvert_{x = \hat{x}_{k|k-1}}$.
+\begin{center}
+\medskip %\normalsize
+\textbf{Measurement Update (Estimation)}
+\end{center}
+\STATE \label{alg:ekf_innov} Compute the measurement pre-fit residual: $\Tilde{y}_{k} = \mathbf{y}_{k}-\hat{\mathbf{y}}_{k|k-1}$
+\STATE Compute the residual covariance: $\mathbf{S}_{k} = \mathbf{H}_{k}\mathbf{P}_{x,k|k-1}\mathbf{H}_{k}^\top + \mathbf{R}_{k}$
+\STATE Compute the Kalman gain: $\mathbf{K}_{k}= \mathbf{P}_{x,k|k-1}\mathbf{H}_{k}^\top
+\mathbf{S}_{k}^{-1}$.
+\STATE \label{alg:ekf_state_post} Compute the updated state estimate: $\hat{\mathbf{x}}_{k|k} = \hat{\mathbf{x}}_{k|k-1}+\mathbf{K}_{k}\Tilde{y}_{k}$.
+\STATE \label{alg:ekf_cov_post} Compute the updated error covariance:
+%\begin{center}
+$\mathbf{P}_{x,k|k} = \mathbf{P}_{x,k|k-1} - \mathbf{K}_{k}\mathbf{H}_{k}\mathbf{P}_{x,k|k-1}$.
+%\end{center}
+\medskip
+\STATE Set $k \Leftarrow k+1$ and go to step
+\ref{alg:ekf_pred}.
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[!htb]
+\caption{Linear Kalman Filter}\label{alg:lkf}
+\begin{algorithmic}[1]
+\footnotesize \REQUIRE $\mathbf{y}_{k}$, $\hat{\mathbf{x}}_0$, $\mathbf{P}_{x,0|0}$, $\mathbf{F}_{k}$, $\mathbf{H}_{k}$,  $\mathbf{R}_{k}$, and $\mathbf{Q}_{k}$ $\forall$ $k \geq 0$
+\medskip
+\STATE Set ${k} \Leftarrow 1$
+\begin{center}
+%\medskip %\normalsize
+\textbf{Time Update (Prediction)}
+\end{center}
+\STATE \label{alg:kf_pred} Compute the predicted state by propagating the mean through the nonlinearity: $\hat{\mathbf{x}}_{k|k-1} = \mathbf{F}_{k-1}\hat{\mathbf{x}}_{k-1|k-1}$.
+\STATE \label{alg:kf_cov_pred} Compute the predicted error covariance:
+%\begin{center}
+$\mathbf{P}_{x,k|k-1}  = \mathbf{F}_{k-1} \mathbf{P}_{x,k-1|k-1}
+\mathbf{F}_{k-1}^\top + \mathbf{Q}_k$.
+%\end{center}
+\medskip
+\STATE \label{alg:kf_meas} Compute the predicted measurement: $\hat{\mathbf{y}}_{k|k-1} = \mathbf{H}_{k}\hat{\mathbf{x}}_{k|k-1}$.
+%\end{center}
+\begin{center}
+\medskip %\normalsize
+\textbf{Measurement Update (Estimation)}
+\end{center}
+\STATE \label{alg:kf_innov} Compute the measurement pre-fit residual: $\Tilde{y}_{k} = \mathbf{y}_{k}-\hat{\mathbf{y}}_{k|k-1}$
+\STATE Compute the residual covariance: $\mathbf{S}_{k} = \mathbf{H}_{k}\mathbf{P}_{x,k|k-1}\mathbf{H}_{k}^\top + \mathbf{R}_{k}$
+\STATE Compute the Kalman gain: $\mathbf{K}_{k}= \mathbf{P}_{x,k|k-1}\mathbf{H}_{k}^\top
+\mathbf{S}_{k}^{-1}$.
+\STATE \label{alg:kf_state_post} Compute the updated state estimate: $\hat{\mathbf{x}}_{k|k} = \hat{\mathbf{x}}_{k|k-1}+\mathbf{K}_{k}\Tilde{y}_{k}$.
+\STATE \label{alg:kf_cov_post} Compute the updated error covariance:
+%\begin{center}
+$\mathbf{P}_{x,k|k} = \mathbf{P}_{x,k|k-1} - \mathbf{K}_{k}\mathbf{H}_{k}\mathbf{P}_{x,k|k-1}$.
+%\end{center}
+\medskip
+\STATE Set $k \Leftarrow k+1$ and go to step
+\ref{alg:kf_pred}.
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{} \label{sec:A3}
+
+The block diagram of the extended Kalman Filter shown in Figure \ref{fig:ekf}. Here, the \emph{prediction} block is responsible only for computing the covariance prediction described in Step \ref{alg:ekf_P_pred} of Algorithm \ref{alg:ekf}, with the evaluation of the nonlinear and linearized state transition and measurement equations split into their own blocks. In this implementation, the Jacobians are known a priori and need only be evaluated at the current state estimate, however in some implementations it may be necessary to estimate the linearization numerically. The \emph{estimation} and \emph{update} blocks together perform the measurement update of steps \ref{alg:ekf_innov} through \ref{alg:ekf_cov_post}. These blocks together form the \emph{Measurement Update} block, which together with the \emph{Time Update} block yields the recognizable feedback loop form of the filter.
+
+\begin{figure}[!htb]
+\centering
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+\tikzset{  
+block/.style    = {draw, thick, rectangle, minimum height = 1cm, minimum width = 1cm},}
+\tikzstyle{pinstyle} = [pin edge={to-,thick,black}]
+\begin{tikzpicture}[auto, thick, >=triangle 45,fill=blue!20]
+
+\node at (0,0.5)   [block,node distance=2cm,fill=blue!20] (model1) {$f(x)$};
+\node at (0,-0.5) [block,node distance=2cm,fill=blue!20] (model2) {$\frac{\partial f(x)}{\partial x}$};
+\node at (3,-1.5) [block,node distance=3cm,fill=blue!20,minimum height= 1cm] (pred) {Prediction};
+
+\node at (8,0) (o2) {};
+\node at (8,0.5)   [block,node distance=2cm,fill=blue!20] (model3) {$h(x)$};
+\node at (8,-0.5) [block,node distance=2cm,fill=blue!20] (model4) {$\frac{\partial h(x)}{\partial x}$};
+
+\node at (12,-1) [block,node distance=3cm,fill=blue!20,minimum height= 4cm,pin={[pinstyle]above:$y_{k}$}] (est) {Estimation};
+
+\node at (8,-4) [block,node distance=3cm,fill=blue!20,minimum width = 4cm, minimum height= 2cm] (upd) {Update};
+
+\node at (3,-4) [block,node distance=2cm,fill=blue!20] (delay) {$z^{-1}$};
+
+\node at (6.5,0.5) (x_pred) {};
+\node at (8,-1.5) (P_pred) {};
+
+\draw[->] (model1.east) to node[near end,below] {$\hat{x}_{k|k-1}$} (model3.west);
+\draw[->] (x_pred.center) |- node[near start,left] {}(model4.west);
+\draw[->] ($(x_pred.center) - (0,1)$) to node[near start,left] {}($(upd.north)-(1.5,0)$);
+
+\draw[->] (model2.east) -| node[midway,above] {$\mathbf{F}_{k}$} (pred.north);
+
+\draw[->] (model3.east) to node[midway,above] {$\hat{y}_{k|k-1}$} ($(est.west)+(0,1.5)$);
+\draw[->] (model4.east) to node[midway,above] {$\mathbf{H}_{k}$} ($(est.west)+(0,0.5)$);
+
+\draw[->] (pred.east) to node[near end, below] {$\mathbf{P}_{x,k|k-1}$} ($(est.west)+(0,-0.5)$);
+\draw[->] (P_pred.center) to node[near start, below] {} (upd.north);
+
+\draw[->] (est.south) |- node[near start,left] {$\Tilde{y}_{k}$} (upd);
+\draw[->] (est.south) |- node[near start,right] {$\mathbf{K}_{k}$} (upd);
+
+\draw[->] (upd.west) to node[midway,above] {$\hat{x}_{k|k}$} (delay);
+\draw[->] (upd.west) to node[midway,below] {$\mathbf{P}_{x,k|k}$} (delay);
+
+\draw[->] (delay.north) to node[midway,left] {$\mathbf{P}_{x,k-1|k-1}$} (pred.south);
+\draw[->] (delay.west) -| node[near end,left] {$\hat{x}_{k-1|k-1}$} (model2.south);
+
+\begin{pgfonlayer}{background}
+% Compute a few helper coordinates
+\path (-2,2) node (c) {};
+\path (14,-6) node (d) {};
+\path[fill=blue!10,rounded corners, draw=black!50, dashed]
+(c) rectangle (d);
+\path (-2,2) node (a) {};
+\path (10,-2.5) node (b) {};
+\path[fill=yellow!20,rounded corners, draw=black!50, dashed]
+(a) rectangle (b);
+\end{pgfonlayer}
+
+\path (model1.north west)+(5,0.5) node (time) {Time Update};
+\path (delay.south west)+(3,-1.0) node (time) {Measurement Update};
+
+\end{tikzpicture}
+\caption{\label{fig:ekf} Block Diagram of the Extended Kalman Filter}
+\end{figure}
+
+An interesting and somewhat unintuitive property of the \emph{linear} Kalman filter is that both the a priori error covariance $\mathbf{P}_{x,k|k-1}$ and a posteriori covariance $\mathbf{P}_{x,k|k}$ can be computed independently of the state estimates $\hat{\mathbf{x}}_{k|k-1}$, $\hat{\mathbf{x}}_{k|k}$ as well as the measurements $y_{k} \forall k \geq 0$. This can most easily be shown by examining the steps of the Kalman filter equations detailed in Algorithm \ref{alg:lkf}. Notably, the a posteriori covariance $\mathbf{P}_{x,k|k}$ computed in Step \ref{alg:kf_cov_post} follows directly from the a priori covariance $\mathbf{P}_{x,k|k-1}$ computed in Step \ref{alg:kf_cov_pred}, with each of the intermediate steps depending only on $\mathbf{F}_{k}$, $\mathbf{H}_{k}$,  $\mathbf{R}_{k}$, and $\mathbf{Q}_{k}$. In the case of the linear Kalman filter, each of these parameters are independent of the state estimate $\hat{x}_{k}$ and known a priori and, as such, it is even possible to pre-compute the estimation covariance an arbitrary number of steps in the future. This property holds as long as the conditions for Kalman filter optimality are satisfied. Namely,
+\begin{itemize}
+    \item \label{alg:kf_cond1} The state space model perfectly matches the real system
+    \item The additive noise is white across iterations 
+    \item The covariances $\mathbf{R}_{k}$, and $\mathbf{Q}_{k}$ are exactly known
+\end{itemize}
+In short, although the mean of the predictive and posterior distributions depend on random samples drawn from the output distribution, the covariance of both of these distributions depend only on the covariance of the output distribution, which is purely deterministic. In the case of the extended Kalman filter, however, this property does not hold due to the fact that the model matching criterion does not hold for non-infinitesimal step sizes. Specifically, the model at each update is an \emph{approximation} of the true model through truncation of the higher order terms. Failure of this property in the case of the extended Kalman filter is reflected in the fact that $\mathbf{F}_{k}$ and $\mathbf{H}_{k}$ are each functions of the state estimate $\hat{x}_{k}$, which is in turn a function of the measurements $y_{k}$. As such, the transition and measurement matrices $\mathbf{F}_{k}$ and $\mathbf{H}_{k}$ are \emph{not} independent of the measurements $y_{k}$, and consequently may not be pre-computed.
+
+\subsection{} \label{sec:A4}
+
+Applications of the Kalman filter or extended Kalman filter typically assume that the additive process and observation noise denoted by $\omega_{k}$ and $\nu_{k}$ are are both zero mean multivariate Gaussian noises with covariance $Q_{k}$ and $R_{k}$ respectively. From this assumption it follows through (\ref{eq:ss_lin}) that the state $x_{k}$ and measurement $y_{k}$ are both multivariate Gaussian processes as well. In the case of a linear state space model, this Gaussianity is one of the necessary conditions for the Kalman filter to be the best linear unbiased estimator (BLUE), or optimal in the minimum mean squared error (MMSE) sense. To understand the purpose of this condition, we consider the most general Bayesian characterization of the update step of the filter:
+
+\begin{align}
+    p(x_{k}|y_{1:k}) = \frac{p(y_{k}|x_{k})p(x_{k}|y_{1:k-1})}{p(y_{k}|y_{k-1})} \propto p(y_{k}|x_{k})p(x_{k}|y_{1:k-1})
+\end{align}
+
+\noindent Here, $p(y_{k}|x_{k})$ represents the likelihood of the current measurement and $p(x_{k}|y_{1:k-1})$ represents the distribution of the predicted state. The posterior $p(x_{k}|y_{1:k})$ characterizes the estimate as well as the estimation uncertainty. Under the Gaussian assumption, this application of Bayes rule has two useful properties which are leveraged by the Kalman filter:
+\begin{itemize}
+    \item Having an a priori distribution which is the conjugate of the likelihood distribution results in a closed-form expression for the posterior distribution that is of the same type as the a priori. In the case of both the likelihood and a priori distributions being Gaussian, the posterior will be Gaussian, and its first and second moments and may be computed analytically.
+    \item With both the a priori and a posteriori distributions being Gaussian, complete characterization of the filter state can be maintained by keeping track of only the mean and covariance of the current state estimate.
+\end{itemize}
+The result of the first property is that under the condition where the additive noises are both Gaussian, the state estimate remains purely Gaussian across recursions. This assumption leads directly to an important assumption behind the standard Kalman filter formulation: that the mean of the posterior estimate $p(x_{k}|y_{1:k})$ will always provide an unbiased estimate of $x_{k|k}$, and a complete characterization of the estimation error through its covariance $\mathbf{P}_{x,k|k-1}$ without the need for estimating and tracking any higher order moments. 
+
+The extended Kalman filter follows this same procedure and makes use of these same assumptions, but is suboptimal in the sense that the linearization of the model at each step introduces errors into the filter computations which bias these estimates. This means that the estimates  $x_{k|k}$ and $\mathbf{P}_{x,k|k-1}$ no longer provide an accurate characterization of the posterior distribution, but rather an approximation of it. Although these approximations can be relatively accurate for certain systems, over a large number of recursions these errors will invariably accumulate and cause the filter to diverge. Additive noise drawn according to an arbitrarily non-Gaussian probability distribution affects the tracking performance in the same way: the distributions characterized by the filter parameters will be treated as Gaussian approximations of arbitrarily non-Gaussian distributions. Depending on the type of distribution being approximated, this can have a greater or lesser impact on the number of iterations before the filter inevitably diverges.
+
+The literature provides a number of methods for modifying the Kalman filter to handle arbitrary or unknown additive noise distributions. These may include tracking of higher order moments or the use of Bayesian methods to handle fully known non-Gaussian distributions. In general, these methods may not be able to leverage conjugate distributions and tracking may become arbitrarily complex with many iterations. As an alternative to this, researchers have proposed  various methods for characterizing and estimating the loss in filter performance due to mischaracterization of arbitrarily non-Gaussian additive noise as Gaussian \cite{Maryak97}.
+
+%  The first thing to consider is that the Kalman filter attempts to track propagation of  through 
+
+% If applied to a non-Gaussian problem, the filter is no longer guaranteed to be unbiased, however the Kalman filter remains the optimal linear estimator so long as the dynamic model remains Markovian.
+
+\subsection{}
+
+It has been shown in the literature that optimal tracking performance, the innovations sequence $\Tilde{y}_{1} \hdots \Tilde{y}_{k}$ is a Gaussian white noise sequence with the same covariance as the additive noise component $\nu_{k}$ \cite{Frost71}. This is typically referred to as the \emph{innovations property} of the linear Kalman filter, and the whiteness of this sequence is frequently used as a metric for filter performance. Recall, however, that optimal filter performance is dependent on the necessary conditions listed in \ref{sec:A3}, and is not generally achievable through application of the extended Kalman filter to a nonlinear problem. Thus, we can say for linear approximations of nonlinear dynamic models, the innovations sequence of the extended Kalman filter will be a colored Gaussian process with nonzero mean, and with the the level of coloration and bias being reflective of the loss in performance due to the linearization.
+
+\section{Discussion of the Cubature Kalman Filter (CKF)}
+\label{sec:ckf}
+
+\subsection{}
+
+Recursive Bayesian estimation, of which the Kalman filter is a particular case, is a method which relies on two important assumptions about the dynamic model: that the true state $x$ is an unobserved Markov process and that the measurements $y$ are the observed states of a Hidden Markov model (HMM). This assumption establishes two important independence relationships which make recursion possible: firstly, that the probability of the current state given the immediately previous state is conditionally independent of all prior states.
+\begin{equation} \label{eq:mark1}
+    p(x_{k}|x_{k-1}, x_{k-2}, \hdots, x_{1}, x_{0}) = p(x_{k}|x_{k-1})
+\end{equation}
+Secondly, that the measurement at a given step is dependent only on the current state, and thus conditionally independent of all previous and future states given the current state.
+\begin{equation} \label{eq:mark2}
+    p(y_{k}|x_{k}, x_{k-1}, \hdots, x_{1}, x_{0}) = p(y_{k}|x_{k})
+\end{equation}
+From here, the probability distribution over all states can be written as
+\begin{equation} \label{eq:total_prob}
+    p(x_{0}, \hdots, x_{k}, y_{0}, \hdots, y_{k}) = p(x_{0}) \prod_{i=1}^{k} p(y_{i}|x_{i})p(x_{i}|x_{i-1})
+\end{equation}
+The goal is to obtain a distribution of the current state $x_{k}$ conditioned on all current and previously obtained measurements $y_{0}, \hdots, y_{k}$, from which an estimate of the current state may be obtained. This can be done by marginalizing the total probability distribution computed in (\ref{eq:total_prob}) over $x_{0}, \hdots, x_{k-1}$ and dividing by the total probability of the measurements to obtain the posterior distribution $p(x_{k}|y_{0}, \hdots, y_{k})$. In general, without very specific constraints on the distributions of the hidden and observed states, direct computation of this marginalization is likely intractible.
+
+Alternatively, this process can be approached as a recursion with two steps: prediction and estimation. In the prediction step, the posterior distribution $p(x_{k-1}|y_{0},\hdots,y_{k-1})$ from the previous step is used to compute a predictive distribution $p(x_{k}|y_{0},\hdots,y_{k-1})$ can be written as the marginalization of the joint distribution between the current state and the previous state
+\begin{equation} \label{eq:pred1}
+    p(x_{k}|y_{0},\hdots,y_{k-1}) = \int_{\mathbb{R}^{n_{x}}}p(x_{k},x_{k-1}|y_{0},\hdots,y_{k-1}) dx_{k-1}
+\end{equation}
+We can rewrite this joint distribution as the product of conditional distributions
+\begin{equation} \label{eq:pred2}
+    p(x_{k},x_{k-1}|y_{0},\hdots,y_{k-1}) = p(x_{k}|x_{k-1},y_{0},\hdots,y_{k-1})p(x_{k-1}|y_{0},\hdots,y_{k-1}) 
+\end{equation}
+Application of the Markov property (\ref{eq:mark1}) simplifies this to
+\begin{equation} \label{eq:pred3}
+    p(x_{k},x_{k-1}|y_{0},\hdots,y_{k-1}) = p(x_{k}|x_{k-1})p(x_{k-1}|y_{0},\hdots,y_{k-1})
+\end{equation}
+Substituting (\ref{eq:pred3}) into (\ref{eq:pred1}) yields the Chapman-Kolmorogov equation
+\begin{equation}\label{eq:pred4}
+     p(x_{k}|y_{0},\hdots,y_{k-1}) = \int_{\mathbb{R}^{n_{x}}}p(x_{k}|x_{k-1})p(x_{k-1}|y_{0},\hdots,y_{k-1}) dx_{k-1}
+\end{equation}
+which produces the density function of predictive distribution assuming that we know the posterior distribution $p(x_{k-1}|y_{0},\hdots,y_{k-1})$ of the previous time step. This knowledge is obtained from the estimation step of the previous recursion or, for initialization, from prior knowledge of the state distribution.
+
+In the update step, the predictive distribution is updated using the a new measurement to produce the posterior distribution of the state. This is found by applying Bayes' Theorem
+\begin{equation} \label{eq:est1}
+    p(x_{k}|y_{0},\hdots,y_{k}) = \frac{p(y_{k}|x_{k},y_{0},\hdots,y_{k-1})p(x_{k}|y_{0},\hdots,y_{k-1})}{p(y_{k}|y_{0},\hdots,y_{k-1})}
+\end{equation}
+Application of the Markov property (\ref{eq:mark2}) simplifies this to
+\begin{equation} \label{eq:est2}
+    p(x_{k}|y_{0},\hdots,y_{k}) = \frac{p(y_{k}|x_{k})p(x_{k}|y_{0},\hdots,y_{k-1})}{p(y_{k}|y_{0},\hdots,y_{k-1})}
+\end{equation}
+Here, the prior $p(x_{k}|y_{0},\hdots,y_{k-1})$ is the predictive distribution computed in (\ref{eq:pred3}) and the normalization factor $p(y_{k}|y_{0},\hdots,y_{k-1})$ is computed by marginalizing over the current state, conditioned on each of the previous measurements
+\begin{equation} \label{eq:est3}
+    p(y_{k}|y_{0},\hdots,y_{k-1}) = \int_{\mathbb{R}^{n_{x}}} p(x_{k}|y_{0},\hdots,y_{k-1})p(y_{k}|x_{k}) dx_{k}
+\end{equation}
+finally, the posterior distribution $p(x_{k}|y_{0},\hdots,y_{k})$ is used as the prior distribution in (\ref{eq:pred4}) for the next iteration of the estimator.
+
+Together, the prediction and update equations (\ref{eq:pred4}) and (\ref{eq:est2}) form the basis of optimal recursive Bayesian filtering \cite{Arulampalam02,Arasaratnam09a}. An important point of note with this general Bayesian formulation is the need to evaluate the two integrals expressed in and (\ref{eq:pred4}) and (\ref{eq:est3}). Although application of Markovianity reduces each of these from an increasing number of integrals to a single integral, the need to compute these integrals at every recursion remains one of the critical challenges in implementing any sort of Bayesian filtering procedure. Different methodologies approach the problem of computing these integrals in different ways, but by far the most efficient approach is to solve them analytically. In order for this to be possible, it is necessary that both posterior and predictive distributions be of a form such that for given algebraic forms for the respective likelihoods $p(x_{k}|x_{k-1})$ and $p(y_{k}|x_{k})$, the posterior has a known closed-form expression. One approach to this is having the prior be selected or approximated as belonging to a distribution which is the conjugate of the likelihood. The most common example of this, although not the only one, is in the case of a Gaussian prior and likelihood, as described in \ref{sec:A4}.
+
+\subsection{}\label{sec:B2}
+
+The filtering solution is given by the \textit{a posteriori} distribution, $p(\mathbf{x}_{k}| \mathbf{y}_{1:k})$, which in the case of Gaussian systems turns to be Gaussian with parameters which can be computed analytically. If the system is nonlinear and Gaussian, both the transition and likelihood densities are Gaussian distributed, and thus the predictive, posterior and likelihood densities can be approximated by a Gaussian filter \cite{Ito-00,Sarkka13} as
+\begin{align}
+p(\mathbf{x}_{k} | \mathbf{y}_{1:k-1}) &= \mathcal{N}\left(\mathbf{x}_{k} ; \hat{\mathbf{x}}_{k|k-1},  \bm{ P}_{x,k|k-1} \right) \label{eq:gauss} \\
+p(\mathbf{x}_{k} | \mathbf{y}_{1:k}) &= \mathcal{N}\left(\mathbf{x}_{k} ; \hat{\mathbf{x}}_{k|k},  \bm{ P}_{x,k|k} \right) \\
+p(\mathbf{y}_{k} | \mathbf{y}_{1:k-1}) &= \mathcal{N}\left(\mathbf{y}_{k} ; \hat{\mathbf{y}}_{k|k-1},  \bm{ P}_{yy,k|k-1} \right) 
+\end{align}
+The characterizing moments of these densities are recursively computed in two familiar steps: \emph{prediction} and  \emph{update}. In the prediction step, the goal of the filter is to obtain the mean and corresponding error covariance of the predictive distribution
+%\small
+\begin{align}
+\hat{\mathbf{x}}_{k|k-1} &= \int \mathbf{f}(\mathbf{x}_{k-1}) p(\mathbf{x}_{k-1}|\mathbf{y}_{1:k-1}) d\mathbf{x}_{k-1} \label{eq:prediction_mean} \\
+\mathbf{ P}_{x,k|k-1}  &= \int \mathbf{f}^2(\mathbf{x}_{k-1}) p(\mathbf{x}_{k-1}|\mathbf{y}_{1:k-1}) d\mathbf{x}_{k-1} -\hat{\mathbf{x}}_{k|k-1}^2 + \mathbf{Q}_{k-1} \label{eq:prediction_cov}
+\end{align} 
+\normalsize
+After the prediction step, the filter receives a new measurement, $\mathbf{y}_{k}$, and is able to construct the  innovation, $\mathbf{z}_{k} = \mathbf{y}_{k} - \hat{\mathbf{y}}_{k|k-1}$, where the predicted measurement is
+%\small
+\begin{align}
+\hat{\mathbf{y}}_{k|k-1} &= \int \mathbf{h}(\mathbf{x}_{k}) p(\mathbf{x}_{k}| \mathbf{y}_{1:k-1}) d\mathbf{x}_{k}. \label{eq:pred_y}
+\end{align}
+\normalsize
+Estimates of both innovation covariance and cross covariance matrices are computed by the following integrals
+%\small
+\begin{align}
+& \bm P_{yy,k|k-1} =  \int \mathbf{h}^2(\mathbf{x}_{k}) p(\mathbf{x}_{k}| \mathbf{y}_{1:k-1}) d\mathbf{x}_{k} - \hat{\mathbf{y}}_{k|k-1}^2 + \mathbf{R}_{k}, \label{eq:pred_cov} \\ 
+& \bm P_{xy,k|k-1} =  \int \mathbf{x}_{k} \mathbf{h}^{\top}(\mathbf{x}_{k}) p(\mathbf{x}_{k}|\mathbf{y}_{1:k-1}) d\mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1}\hat{\mathbf{y}}_{k|k-1}^{\top}, \label{eq:joint}
+\end{align}
+and the Kalman gain is computed as
+\begin{align}
+    \mathbf{K}_{k} = \bm P_{xy,k|k-1} \left(\bm P_{yy,k|k-1}\right)^{-1}
+\end{align}
+Finally, the Kalman gain $\mathbf{K}_{k}$ is used to update the predictive mean and corresponding prediction error covariance through the following operations
+\begin{align}
+\hat{\mathbf{x}}_{k|k} &= \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}_{k}(\mathbf{y}_{k} -  \hat{\mathbf{y}}_{k|k-1}) \label{eq:posterior_mean} \\
+\mathbf{ P}_{x,k|k}  &= \mathbf{ P}_{x,k|k-1} - \mathbf{K}_{k}\bm P_{yy,k|k-1}\mathbf{K}_{k}^{\top} \label{eq:posterior_cov}
+\end{align}
+
+The main challenge in constructing an efficient recursive algorithm around Bayesian methodology is in computing the several integrations in (\ref{eq:prediction_mean}) through (\ref{eq:joint}) at each iteration of the algorithm. As each of these integrands consists takes the form of \emph{nonlinear function} $\times$ \emph{Gaussian density}, an analytic solution to these Gaussian integrals may not always be easily obtained \cite{Arasaratnam09a}. An important exception to this is in the case of Gaussian systems which are further constrained so that the transition and measurement functions $\mathbf{f}(\cdot)$ and $\mathbf{h}(\cdot)$ simplify to linear matrix operations $\mathbf{F}_{k}$ and $\mathbf{H}_{k}$ respectively. The linear operators may be moved outside of the integrals, and the expectations computed in (\ref{eq:prediction_mean}) through (\ref{eq:prediction_cov}) simplify to
+\begin{align}
+\hat{\mathbf{x}}_{k|k-1} &= \mathbf{F}_{k}\int p(\mathbf{x}_{k-1}|\mathbf{y}_{1:k-1}) d\mathbf{x}_{k-1} \\
+\nonumber &= \mathbf{F}_{k}\hat{\mathbf{x}}_{k-1|k-1} \\
+\mathbf{ P}_{x,k|k-1}  &= \mathbf{F}_{k} \Big( \int p(\mathbf{x}_{k-1}|\mathbf{y}_{1:k-1}) d\mathbf{x}_{k-1} \Big) \mathbf{F}_{k}^{\top} -\hat{\mathbf{x}}_{k|k-1}^2 + \mathbf{Q}_{k-1} \\
+\nonumber &= \mathbf{F}_{k}\mathbf{ P}_{x,k-1|k-1}\mathbf{F}_{k}^{\top} + \mathbf{Q}_{k-1}
+\end{align}
+Equations (\ref{eq:pred_y}) through (\ref{eq:posterior_cov}) simplify in the same way, giving rise to the familiar Kalman filter equations described in Algorithm \ref{alg:lkf}.
+
+\subsection{} \label{sec:B3}
+
+In addition to application to linear tracking, the analytic methodology described in \ref{sec:B2} is leveraged by the extended Kalman filter, which makes linear approximations of the system at each iteration for the purpose of approximating the solution to the prediction and innovation integrals. As described in \ref{sec:A4}, however, linearization is not a suitable approach for every system. Finding methods for evaluating these integrals in highly nonlinear systems has been an important topic of research for the last several decades, resulting in the development of filters based on various numeric evaluation methods. Among these are filters based on Monte Carlo methods (e.g. particle filters), and filters based on deterministic methods, including various sigma-point Kalman filters (SPKF) and a relatively new approach known as the cubature Kalman figler (CKF).
+
+In contrast to the extended Kalman filter, which facilitates solving complicated Gaussian weighted integrals by making a reduced order approximation of the the dynamic system, numeric methods utilize a technique called \emph{numerical quadrature}, or in the case of vector functions \emph{numerical cubature}, which directly estimates the result of an integration through deterministic sampling of the integrand. When applied to the Bayesian filtering problem, this Bayesian quadrature is performed by identifying a set of representative points in the prior distribution, propagating those points through the nonlinear function, and then approximating the properties of the resulting distribution as a weighted sum of the propagated points. Exactly how these points are selected and recombined is the main difference between different types of numeric Kalman filters, including sigma-point filters and cubature filters.
+
+To understand how this procedure works to produce an efficient filtering algorithm, we consider the block diagram of a numeric integration Kalman filter depicted in Figure \ref{fig:ckf}. The first thing that we observe is that the structure of the filter follows a similar form to that of the extended Kalman filter depicted in Figure \ref{fig:ekf}: the familiar time-measurement update feedback loop is still present, with a gain being used to update the predicted state estimate based on the prediction error covariance, and predicted and observed measurements. Where things are different is in the way the state estimation densities are evaluated through the state transition and measurement equation blocks. In the place of the Jacobian blocks which were found in parallel with the respective equation blocks in the extended Kalman filter, this \emph{cubature Kalman filter} features \emph{Evaluation} and \emph{Summation} blocks in series. These blocks are responsible for performing the deterministic sampling and weighted summation needed to approximate the result of the Gaussian integrals described in \ref{sec:B2}. By changing the set of rules by which these evaluation and summation blocks operate, this same block diagram might be used for any number of different numeric filters. The details of how they operate for two important filters, the unscented Kalman filter and the cubature Kalman filter, will be discussed in \ref{sec:B4}.
+
+\begin{figure}[!htb]
+\centering
+
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+\tikzset{  
+block/.style    = {draw, thick, rectangle, minimum height = 1cm, minimum width = 1cm},}
+\tikzstyle{pinstyle} = [pin edge={to-,thick,black}]
+\begin{tikzpicture}[auto, thick, >=triangle 45,fill=blue!20]
+
+\node at (0,-5)   [block,node distance=2cm,fill=blue!20,minimum width= 2cm,minimum height= 2cm] (eval1) {Evaluation};
+\node at (0,0.5)   [block,node distance=2cm,fill=blue!20] (model1) {$f(x)$};
+\node at (3,0.5)   [block,node distance=2cm,fill=blue!20,minimum height= 2cm] (pred1) {$\bf \Sigma$};
+
+\node at (7,0.5) [block,node distance=2cm,fill=blue!20,minimum width= 2cm,minimum height= 2cm] (eval2) {Evaluation};
+
+% \node at (4,-1.5) [block,node distance=3cm,fill=blue!20,minimum height= 1cm] (pred1) {Prediction};
+
+\node at (10,0.5)   [block,node distance=2cm,fill=blue!20] (model3) {$h(x)$};
+
+\node at (13,0.5)   [block,node distance=2cm,fill=blue!20,minimum height= 1cm] (pred2) {$\bf \Sigma$};
+
+\node at (13,-4) [block,node distance=3cm,fill=blue!20,minimum height= 4cm,pin={[pinstyle]right:$y_{k}$}] (est) {Estimation};
+
+
+\node at (9,-5) [block,node distance=3cm,fill=blue!20,minimum width = 2cm, minimum height= 1cm] (upd) {Update};
+
+\node at (6,-5) [block,node distance=2cm,fill=blue!20] (delay) {$z^{-1}$};
+
+\node at (5,0.5) (x_pred) {};
+\node at (8.5,0.5) (Xx_pred) {};
+\node at (9,-3.5) (P_pred) {};
+
+\draw[->] (eval1.north) to node[midway,right] {$\bf {X}_{k-1|k-1}$} (model1.south);
+\draw[->] (model1.east) to node[midway,above] {$\bf {X}^{*}_{k|k-1}$} (pred1.west);
+\draw[->] ($(pred1.east)$) to node[midway,above] {$\mathbf{P}_{x,k|k-1}$} ($(eval2.west)$);
+\draw[->] ($(pred1.east)$) to node[near start,below]  {$\hat{x}_{k|k-1}$} ($(eval2.west)$);
+
+
+% \draw[->] (x_pred.center) |- node[near start,left] {}(model4.west);
+
+% \draw[->] (model2.east) -| node[midway,above] {$\mathbf{F}_{k}$} (pred1.north);
+
+\draw[->] (model3.east) to node[midway,above] {$\bf Y_{k|k-1}$} (pred2.west); % ($(est.west)+(0,1.5)$);
+
+\draw[->] (pred2.south) to node[midway,left] {$\hat{y}_{k|k-1}$} (est.north); % ($(est.west)+(0,1.5)$);
+\draw[->] (pred2.south) to node[midway,right] {$\bf Y_{k|k-1}$} (est.north); % ($(est.west)+(0,1.5)$);
+
+% \draw[->] (pred1.east) to node[near start, below] {$\mathbf{P}_{x,k|k-1}$} ($(est.west)+(0,-0.5)$);
+\draw[->] (x_pred.center) |- node[near start, below] {} ($(est.west)+(0,0.5)$);
+\draw[->] (Xx_pred.center) |- node[near start, below] {} ($(est.west)+(0,1.5)$);
+\draw[->] (P_pred.center) to node[midway,below]{} (upd.north);
+
+\draw[->] ($(est.west)-(0,1)$) to node[midway,above] {$\Tilde{y}_{k}$} (upd);
+\draw[->] ($(est.west)-(0,1)$) to node[midway,below] {$\mathbf{K}_{k}$} (upd);
+
+\draw[->] (eval2.east) to node[midway,above] {$\bf {X}_{k|k-1}$} (model3);
+
+\draw[->] (upd.west) to node[midway,above] {$\hat{x}_{k|k}$} (delay);
+\draw[->] (upd.west) to node[midway,below] {$\mathbf{P}_{x,k|k}$} (delay);
+
+\draw[->] (delay.west) to node[midway,above] {$\hat{x}_{k-1|k-1}$} (eval1.east);
+\draw[->] (delay.west) to node[midway,below] {$\mathbf{P}_{x,k-1|k-1}$} (eval1.east);
+
+\begin{pgfonlayer}{background}
+% Compute a few helper coordinates
+\path (-2,2) node (a) {};
+\path (5,-7) node (b) {};
+\path[fill=yellow!20,rounded corners, draw=black!50, dashed]
+(a) rectangle (b);
+\path (5,2) node (c) {};
+\path (15,-7) node (d) {};
+\path[fill=blue!10,rounded corners, draw=black!50, dashed]
+(c) rectangle (d);
+\end{pgfonlayer}
+
+\path (eval1.south west)+(3,-0.5) node (time) {Time Update};
+\path (delay.south west)+(3,-1.0) node (time) {Measurement Update};
+
+\end{tikzpicture}
+\caption{\label{fig:ckf} Block Diagram of the Cubature Kalman Filter}
+\end{figure}
+
+
+
+\subsection{}\label{sec:B4}
+
+Prior to the development of the cubature Kalman filter, the state of the art for efficient numeric state estimation in nonlinear systems belonged to a family of estimators called sigma-point Kalman filters (SPKF) \cite{Wan00}. The most well known and generally applicable among these is the unscented Kalman filter (UKF), % The unscented Kalman  is a numeric integration filter. As such they are similar in that each method seeks to numerically estimate the result of a complicated Gaussian weighted integral by deterministically identifying a set of representative points in the prior distribution, propagating those points through the nonlinear function, and then approximating the resulting integral as a weighted sum of the propagated points. Where these filters diverge, so to speak, is in the rules by which the representative points and their corresponding weights are selected.
+% Where as the cubature Kalman filter establishes its rules based on a transformation from Cartesian coordinates to spherical-radial coordinates,
+which was developed as an alternative to the Kalman filter based on the idea that it is easier and more intuitive to approximate a probability distribution by characterizing its moments than it is to approximate an arbitrarily nonlinear function \cite{julier98}. To this end, the unscented Kalman filter establishes its rules with the purpose of finding sigma-points that capture the most important statistical properties of the prior random variable $x$ \cite{VanDerMerwe04}. In particular, this filter leverages a mathematical technique called the unscented transform (UT) to maintain the first and second moments of an arbitrary distribution to third order precision through a given nonlinear transformation. Doing for a state-vector of dimension $n$ requires $2n+1$ symmetric sigma points computed from the mean and root covariance of $p(x)$.
+\begin{align}
+    \mathbf{\chi}_{0} &= \mu_{x}, &\omega_{0} &= \frac{\kappa}{n+\kappa} \\
+    \mathbf{\chi}_{i} &= \mu_{x} + \big( \sqrt{(n+\kappa)\Sigma_{x}}\big)_{i}, &\omega_{i} &= \frac{1}{2(n+\kappa)} \\
+    \mathbf{\chi}_{n+i} &= \mu_{x} - \big( \sqrt{(n+\kappa)\Sigma_{x}}\big)_{i}, &\omega_{n+i} &= \frac{1}{2(n+\kappa)}
+\end{align}
+This computation is performed by the \emph{Evaluation} blocks of the block diagram in Figure \ref{fig:ckf}, while the \emph{Summation} blocks perform the moment matching computations to obtain the posterior statistics
+\begin{align}
+    \mu_{y} &\approx \sum_{i = 0}^{2n} \omega_{i} f(\mathbf{\chi}_{i}) \\
+    \Sigma_{y} &\approx \sum_{i = 0}^{2n} \omega_{i} (f(\mathbf{\chi}_{i}) - \mu_{y})(f(\mathbf{\chi}_{i}) - \mu_{y})^{\top}
+\end{align}
+Although this approach does not explicitly constrain the problem to Gaussian distributions, accurate performance requires that the underlying distributions be fully characterized by the first two moments, or in the case of symmetric densities, the first three moments, in order to avoid errors introduced through mismatching of higher order moments.
+
+% on a minimal deterministic sampling technique called the unscented transform (UT), which is a technique used to estimate the result of applying a given nonlinear transformation to a probability distribution that is characterized only in terms of a finite set of statistics. 
+
+The cubature Kalman filter approaches the integration problem in a somewhat different way: rather than selecting the representative points with a focus on optimal characterization of the state density $p(x)$, the cubature Kalman filter selects points in a way that aims to maximize the accuracy of the cubature approximation. It does this adapting established monomial-based cubature rules to the domain of Gaussian filtering. To facilitate this, a transformation is made from the Cartesian vector $x \in \mathbb{R}^{n_{x}}$ to the radius vector $r$, and the direction vector $y$, resulting in integrals which may be estimated numerically using a spherical-radial rule derived in the literature \cite{Arasaratnam09b}. Finally, this rule is adapted to Gaussian integrals by exploiting the equality
+\begin{equation} \label{eq:prop33}
+    \int_{\mathbb{R}^{n_{x}}} \mathbf{f}(\mathbf{x})\mathcal{N}\left(\mathbf{x} ; \mu,\Sigma \right) d\mathbf{x} = \int_{\mathbb{R}^{n_{x}}} \mathbf{f}(\sqrt{2\Sigma}\mathbf{x})\exp{\left(\mathbf{x}^{\top}\mathbf{x}\right)} d\mathbf{x}
+\end{equation}
+and yielding the following rule in Cartesian coordinates for solving the integrals described in \ref{sec:B2}.
+\begin{align}
+    \int_{\mathbb{R}^{n_{x}}} \mathbf{f}(\mathbf{x})\mathcal{N}\left(\mathbf{x} ; \mu,\Sigma \right) d\mathbf{x} \approx \sum_{i=1}^{2n} \omega_{i} \mathbf{f}(\sqrt{\Sigma}\xi{i} + \mu)
+\end{align}
+with $m = 2n$ being the number of cubature points required and
+\begin{align}
+    \xi_{i} &= \sqrt{\frac{m}{2}}([\mathbf{1}])_{i}, \omega_{i} = \frac{1}{m} \forall i = 1,2,\hdots,m=2n
+\end{align}
+As these cubature rules are derived based on the specific Gaussian relationship described in (\ref{eq:prop33}), Gaussianity is an even more stringent requirement of the cubature Kalman filter than of the unscented Kalman filter. In exchange for this, the cubature Kalman filter has been shown to produce a more accurate and numerically stable solution than the unscented Kalman filter.
+
+\section{Comparison of the CKF with the EKF}
+\label{sec:comparison}
+
+\subsection{}
+
+To summarize the discussion from \ref{sec:B3} and \ref{sec:B4}, the extended Kalman filter and the cubature Kalman filter represent two significantly different approaches to the same problem: the need to solve integrals of the form \emph{nonlinear function} $\times$ \emph{Gaussian density}, referred to throughout this text as Gaussian integrals. Whereas the extended Kalman filter simplifies these integrals by approximating the nonlinear functions as being locally linear, the cubature Kalman filter adapts numerical cubature techniques to provide much closer and more robust approximations of the result of these integrations.
+
+\subsection{}
+
+The main advantage of employing cubature or other numerical integration techniques over a comparatively simple linearization approach is that they can provide a stable solution for dynamic systems where linear approximation leads to filter instability. This can happen if the system dynamics involve heavily weighted nonlinear terms or if the update rate of the filter is insufficiently high to take advantage of local linearity. This is a situation that commonly arises in tracking systems which operate at high rates of change, such as those used in aeronautics. That isn nt to say that the extended Kalman filter does not have its uses. For nonlinear systems for which linearization leads to a reasonable approximation, or for those systems for which tracking time is short enough that errors don't have time to accumulate, the ease with which the extended Kalman filter can be implemented and tuned makes it a good choice.
+
+\subsection{}
+
+The computational complexity of the cubature Kalman filter using the third-degree cubature rule has been computed to be approximately $\frac{26}{3}n_{x}^{3}$, where $n_{x}$ is the dimensionality of the state \cite[p.62]{Arasaratnam09b}. This is on the same order as the extended Kalman filter, but with a slightly higher scaling factor. It can then be said that the cubature Kalman filter is slightly more expensive, particularly for low dimensional problems.
+
+%
+\bibliographystyle{plain}
+\renewcommand{\refname}{\uppercase{References}}
+\renewcommand*{\bibfont}{\footnotesize}
+\setlength{\bibsep}{4pt}
+\bibliography{biblio}
+
+\end{document}

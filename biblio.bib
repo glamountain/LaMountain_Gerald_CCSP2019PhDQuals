@@ -1,0 +1,119 @@
+@STRING{itgrs = "IEEE Trans. Geosci. and Remote Sensing"}
+@STRING{itac = "IEEE Trans. on Automatic Control"}
+@STRING{itsp = "IEEE Trans. on Signal Processing"}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@inproceedings{Maryak97,
+abstract = {<p>The Kalman filter is frequently used for state estimation in state-space models when the standard Gaussian noise assumption does not apply. A problem arises, however, in that inference based on the incorrect Gaussian assumption can lead to misleading or erroneous conclusions about the relationship of the Kalman filter estimate to the true (unknown) state. This paper shows how inequalities from probability theory associated with the probabilities of convex sets have potential for characterizing the estimation error of a Kalman filter in such a non-Gaussian (distribution-free) setting.</p>},
+pages = {2127--2132 vol.3},
+volume = {3},
+publisher = {IEEE},
+booktitle = {Proceedings of the 1997 American Control Conference (Cat. No.97CH36041)},
+isbn = {0780338324},
+year = {1997},
+title = {Use of the Kalman filter for inference in state-space models with unknown noise distributions},
+language = {eng},
+author = {Maryak, J.L and Spall, J.C and Heydon, B.D},
+keywords = {State Estimation ; Gaussian Noise ; Distributed Computing ; Uncertainty ; Probability Distribution ; Vectors ; Equations ; Loss Measurement ; Bayesian Methods ; Physics ; Engineering ; Physics},
+}
+
+@ARTICLE{Frost71,
+author={P. A. Frost and T. Kailath},
+journal={IEEE Trans. on Automatic Control},
+title={{An innovations approach to least-squares estimation--Part III: Nonlinear Estimation in White Gaussian Noise}},
+year={1971},
+volume={16},
+number={3},
+pages={217-226},
+month={July}}
+
+@article{Arasaratnam09a,
+issn = {0018-9286},
+abstract = {<p>In this paper, we present a new nonlinear filter for high-dimensional state estimation, which we have named the <i>cubature</i> <i>Kalman</i> <i>filter</i> (CKF). The heart of the CKF is a spherical-radial cubature rule, which makes it possible to numerically compute multivariate moment integrals encountered in the nonlinear Bayesian filter. Specifically, we derive a third-degree spherical-radial cubature rule that provides a set of cubature points scaling linearly with the state-vector dimension. The CKF may therefore provide a systematic solution for high-dimensional nonlinear filtering problems. The paper also includes the derivation of a square-root version of the CKF for improved numerical stability. The CKF is tested experimentally in two nonlinear state estimation problems. In the first problem, the proposed cubature rule is used to compute the second-order statistics of a nonlinearly transformed Gaussian random variable. The second problem addresses the use of the CKF for tracking a maneuvering aircraft. The results of both experiments demonstrate the improved performance of the CKF over conventional nonlinear filters.</p>},
+journal = {IEEE Transactions on Automatic Control},
+pages = {1254--1269},
+volume = {54},
+publisher = {IEEE},
+number = {6},
+year = {2009},
+title = {Cubature Kalman Filters},
+language = {eng},
+author = {Arasaratnam, I and Haykin, S},
+keywords = {Nonlinear Filters ; State Estimation ; Kalman Filters ; Heart ; Bayesian Methods ; Filtering ; Numerical Stability ; Testing ; Statistics ; Random Variables ; Bayesian Filters ; Cubature Rules ; Gaussian Quadrature Rules ; Invariant Theory ; Kalman Filter ; Nonlinear Filtering ; Engineering ; Statistics},
+}
+
+@article{Arulampalam02,
+issn = {1053-587X},
+abstract = {<p>Increasingly, for many application areas, it is becoming important to include elements of nonlinearity and non-Gaussianity in order to model accurately the underlying dynamics of a physical system. Moreover, it is typically crucial to process data on-line as it arrives, both from the point of view of storage costs as well as for rapid adaptation to changing signal characteristics. In this paper, we review both optimal and suboptimal Bayesian algorithms for nonlinear/non-Gaussian tracking problems, with a focus on particle filters. Particle filters are sequential Monte Carlo methods based on point mass (or "particle") representations of probability densities, which can be applied to any state-space model and which generalize the traditional Kalman filtering methods. Several variants of the particle filter such as SIR, ASIR, and RPF are introduced within a generic framework of the sequential importance sampling (SIS) algorithm. These are discussed and compared with the standard EKF through an illustrative example.</p>},
+journal = {IEEE Transactions on Signal Processing},
+pages = {174--188},
+volume = {50},
+publisher = {IEEE},
+number = {2},
+year = {2002},
+title = {A tutorial on particle filters for online nonlinear/non-Gaussian Bayesian tracking},
+language = {eng},
+author = {Arulampalam, M.S and Maskell, S and Gordon, N and Clapp, T},
+keywords = {Tutorial ; Particle Filters ; Nonlinear Dynamical Systems ; Costs ; Signal Processing ; Bayesian Methods ; Particle Tracking ; Kalman Filters ; Filtering ; Monte Carlo Methods ; Engineering},
+}
+
+@article{Ito-00,
+issn = {0018-9286},
+abstract = {<p>We develop and analyze real-time and accurate filters for nonlinear filtering problems based on the Gaussian distributions. We present the systematic formulation of Gaussian filters and develop efficient and accurate numerical integration of the optimal filter. We also discuss the mixed Gaussian filters in which the conditional probability density is approximated by the sum of Gaussian distributions. A new update rule of weights for Gaussian sum filters is proposed. Our numerical tests demonstrate that new filters significantly improve the extended Kalman filter with no additional cost, and the new Gaussian sum filter has a nearly optimal performance.</p>},
+journal = {IEEE Transactions on Automatic Control},
+pages = {910--927},
+volume = {45},
+publisher = {IEEE},
+number = {5},
+year = {2000},
+title = {Gaussian filters for nonlinear filtering problems},
+language = {eng},
+author = {Ito, K and Xiong, K},
+keywords = {Filters ; Filtering ; Gaussian Distribution ; Indium Tin Oxide ; Sonar Navigation ; Bayesian Methods ; Gaussian Processes ; Testing ; Cost Function ; Engineering},
+}
+
+@BOOK{Sarkka13,
+    Author         = {S. S\"arkk\"a},
+    Publisher      = {Cambridge University Press},
+    Title          = {Bayesian Filtering and Smoothing},
+    Year           = {2013}
+}
+
+@inproceedings{Wan00,
+abstract = {<p>This paper points out the flaws in using the extended Kalman filter (EKE) and introduces an improvement, the unscented Kalman filter (UKF), proposed by Julier and Uhlman (1997). A central and vital operation performed in the Kalman filter is the propagation of a Gaussian random variable (GRV) through the system dynamics. In the EKF the state distribution is approximated by a GRV, which is then propagated analytically through the first-order linearization of the nonlinear system. This can introduce large errors in the true posterior mean and covariance of the transformed GRV, which may lead to sub-optimal performance and sometimes divergence of the filter. The UKF addresses this problem by using a deterministic sampling approach. The state distribution is again approximated by a GRV, but is now represented using a minimal set of carefully chosen sample points. These sample points completely capture the true mean and covariance of the GRV, and when propagated through the true nonlinear system, captures the posterior mean and covariance accurately to the 3rd order (Taylor series expansion) for any nonlinearity. The EKF in contrast, only achieves first-order accuracy. Remarkably, the computational complexity of the UKF is the same order as that of the EKF. Julier and Uhlman demonstrated the substantial performance gains of the UKF in the context of state-estimation for nonlinear control. Machine learning problems were not considered. We extend the use of the UKF to a broader class of nonlinear estimation problems, including nonlinear system identification, training of neural networks, and dual estimation problems. In this paper, the algorithms are further developed and illustrated with a number of additional examples.</p>},
+pages = {153--158},
+publisher = {IEEE},
+booktitle = {Proceedings of the IEEE 2000 Adaptive Systems for Signal Processing, Communications, and Control Symposium (Cat. No.00EX373)},
+isbn = {0780358007},
+year = {2000},
+title = {The unscented Kalman filter for nonlinear estimation},
+language = {eng},
+author = {Wan, E.A and Van Der Merwe, R},
+keywords = {Nonlinear Systems ; Random Variables ; Nonlinear Dynamical Systems ; Filters ; Sampling Methods ; Taylor Series ; Computational Complexity ; Performance Gain ; Machine Learning ; Neural Networks ; Engineering},
+}
+
+@phdthesis{VanDerMerwe04,
+ author = {Van Der Merwe, R and Wan, E.A},
+ title = {Sigma-point Kalman Filters for Probabilistic Inference in Dynamic State-space Models},
+ year = {2004},
+ note = {AAI3129163},
+ school = {Oregon Health \& Science University},
+ publisher = {Oregon Health \& Science University},
+}
+
+@inproceedings{julier98,
+  title={Skewed approach to filtering},
+  author={Julier, Simon J},
+  booktitle={Signal and Data Processing of Small Targets 1998},
+  volume={3373},
+  pages={271--283},
+  year={1998},
+  organization={International Society for Optics and Photonics}
+}
+
+@phdthesis{Arasaratnam09b,
+  title={Cubature Kalman filtering theory \& applications},
+  author={Arasaratnam, Ienkaran},
+  year={2009},
+  school={McMaster University}
+}
